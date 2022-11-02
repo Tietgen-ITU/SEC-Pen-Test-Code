@@ -31,14 +31,15 @@ CREATE TABLE users (
     username TEXT NOT NULL,
     password TEXT NOT NULL
 );
-
+ 
 INSERT INTO users VALUES(null,"admin", "password");
 INSERT INTO users VALUES(null,"bernardo", "omgMPC");
 INSERT INTO notes VALUES(null,2,"1993-09-23 10:10:10","hello my friend",1234567890);
 INSERT INTO notes VALUES(null,2,"1993-09-23 12:10:10","i want lunch pls",1234567891);
 
 """)
-
+#TODO: Change passwords
+#TODO: Change passwords from plaintext
 
 
 ### APPLICATION SETUP ###
@@ -70,6 +71,7 @@ def notes():
     #Posting a new note:
     if request.method == 'POST':
         if request.form['submit_button'] == 'add note':
+            #TODO: sanitize input
             note = request.form['noteinput']
             db = connect_db()
             c = db.cursor()
@@ -79,11 +81,13 @@ def notes():
             db.commit()
             db.close()
         elif request.form['submit_button'] == 'import note':
+            #TODO: sanitize input
             noteid = request.form['noteid']
             db = connect_db()
             c = db.cursor()
             statement = """SELECT * from NOTES where publicID = %s""" %noteid
             c.execute(statement)
+            #TODO: sanitize input result
             result = c.fetchall()
             if(len(result)>0):
                 row = result[0]
@@ -109,6 +113,7 @@ def notes():
 def login():
     error = ""
     if request.method == 'POST':
+        #TODO: sanitize inputs
         username = request.form['username']
         password = request.form['password']
         db = connect_db()
@@ -117,6 +122,7 @@ def login():
         c.execute(statement)
         result = c.fetchall()
 
+        #TODO: maybe do something here? write better logic 
         if len(result) > 0:
             session.clear()
             session['logged_in'] = True
@@ -135,7 +141,7 @@ def register():
     passworderror = ""
     if request.method == 'POST':
         
-
+        #TODO: sanitize input
         username = request.form['username']
         password = request.form['password']
         db = connect_db()
@@ -184,13 +190,13 @@ if __name__ == "__main__":
     #create database if it doesn't exist yet
     if not os.path.exists(app.database):
         init_db()
-    runport = 5000
+    runport = 80
     if(len(sys.argv)==2):
         runport = sys.argv[1]
     try:
         app.run(host='0.0.0.0', port=runport) # runs on machine ip address to make it visible on netowrk
     except:
         print("Something went wrong. the usage of the server is either")
-        print("'python3 app.py' (to start on port 5000)")
+        print("'python3 app.py' (to start on port 80)")
         print("or")
         print("'sudo python3 app.py 80' (to run on any other port)")
