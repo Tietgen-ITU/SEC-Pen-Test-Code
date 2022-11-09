@@ -1,8 +1,9 @@
+
 import sqlite3, functools, os, time, random, sys
 from flask import Flask, session, redirect, render_template, url_for, request
 from password import hash_password, verify_password
-
-
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 
 ### DATABASE FUNCTIONS ###
 
@@ -37,6 +38,7 @@ def init_db():
 app = Flask(__name__)
 app.database = "db.sqlite3"
 app.secret_key = os.urandom(32)
+limiter = Limiter(app, key_func=get_remote_address)
 
 ### ADMINISTRATOR'S PANEL ###
 def login_required(view):
@@ -89,8 +91,7 @@ def notes():
     db = connect_db()
     c = db.cursor()
     statement = "SELECT * FROM notes WHERE assocUser = ?;"
-    print(statement)
-    c.execute(statement,(session['userid']))
+    c.execute(statement,(session['userid'],))
     notes = c.fetchall()
     print(notes)
     
@@ -98,6 +99,7 @@ def notes():
 
 
 @app.route("/login/", methods=('GET', 'POST'))
+@limiter.limit("50 per hour")
 def login():
     error = ""
     if request.method == 'POST':
@@ -108,7 +110,7 @@ def login():
         statement = "SELECT * FROM users WHERE username = ?;"
         c.execute(statement, username)
         result = c.fetchall()
-
+        print("Result", result)
         #TODO: maybe do something here? write better logic 
         if len(result) > 0:
             user = result[0]
