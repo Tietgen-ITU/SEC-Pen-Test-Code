@@ -71,7 +71,6 @@ def notes():
     #Posting a new note:
     if request.method == 'POST':
         if request.form['submit_button'] == 'add note':
-            #TODO: sanitize input
             note = request.form['noteinput']
             db = connect_db()
             c = db.cursor()
@@ -81,13 +80,11 @@ def notes():
             db.commit()
             db.close()
         elif request.form['submit_button'] == 'import note':
-            #TODO: sanitize input
             noteid = request.form['noteid']
             db = connect_db()
             c = db.cursor()
-            statement = """SELECT * from NOTES where publicID = %s""" %noteid
-            c.execute(statement)
-            #TODO: sanitize input result
+            statement = """SELECT * from NOTES where publicID = ?"""
+            c.execute(statement, noteid)
             result = c.fetchall()
             if(len(result)>0):
                 row = result[0]
@@ -113,7 +110,6 @@ def notes():
 def login():
     error = ""
     if request.method == 'POST':
-        #TODO: sanitize inputs
         username = request.form['username']
         password = request.form['password']
         db = connect_db()
@@ -141,7 +137,6 @@ def register():
     passworderror = ""
     if request.method == 'POST':
         
-        #TODO: sanitize input
         username = request.form['username']
         password = request.form['password']
         db = connect_db()
@@ -157,7 +152,6 @@ def register():
         if(len(c.fetchall())>0):
             errored = True
             usererror = "That username is already in use by someone else!"
-        #TODO: sanitize input
         if(not errored):
             statement = """INSERT INTO users(id,username,password) VALUES(null, ?, ?);"""
             print(statement)
