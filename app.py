@@ -71,28 +71,25 @@ def notes():
     #Posting a new note:
     if request.method == 'POST':
         if request.form['submit_button'] == 'add note':
-            #TODO: sanitize input
             note = request.form['noteinput']
             db = connect_db()
             c = db.cursor()
-            statement = """INSERT INTO notes(id,assocUser,dateWritten,note,publicID) VALUES(null,%s,'%s','%s',%s);""" %(session['userid'],time.strftime('%Y-%m-%d %H:%M:%S'),note,random.randrange(1000000000, 9999999999))
+            statement = """INSERT INTO notes(id,assocUser,dateWritten,note,publicID) VALUES(null, ?, ?, ?, ?);""" 
             print(statement)
-            c.execute(statement)
+            c.execute(statement,(session['userid'] , time.strftime('%Y-%m-%d %H:%M:%S') , note , random.randrange(1000000000, 9999999999)))
             db.commit()
             db.close()
         elif request.form['submit_button'] == 'import note':
-            #TODO: sanitize input
             noteid = request.form['noteid']
             db = connect_db()
             c = db.cursor()
-            statement = """SELECT * from NOTES where publicID = %s""" %noteid
-            c.execute(statement)
-            #TODO: sanitize input result
+            statement = """SELECT * from NOTES where publicID = ?"""
+            c.execute(statement, noteid)
             result = c.fetchall()
             if(len(result)>0):
                 row = result[0]
-                statement = """INSERT INTO notes(id,assocUser,dateWritten,note,publicID) VALUES(null,%s,'%s','%s',%s);""" %(session['userid'],row[2],row[3],row[4])
-                c.execute(statement)
+                statement = """INSERT INTO notes(id,assocUser,dateWritten,note,publicID) VALUES(null, ?, ?, ?, ?);"""
+                c.execute(statement,(session['userid'], row[2], row[3], row[4]))
             else:
                 importerror="No such note with that ID!"
             db.commit()
@@ -100,9 +97,9 @@ def notes():
     
     db = connect_db()
     c = db.cursor()
-    statement = "SELECT * FROM notes WHERE assocUser = %s;" %session['userid']
+    statement = "SELECT * FROM notes WHERE assocUser = ?;"
     print(statement)
-    c.execute(statement)
+    c.execute(statement,(session['userid']))
     notes = c.fetchall()
     print(notes)
     
@@ -113,13 +110,12 @@ def notes():
 def login():
     error = ""
     if request.method == 'POST':
-        #TODO: sanitize inputs
         username = request.form['username']
         password = request.form['password']
         db = connect_db()
         c = db.cursor()
-        statement = "SELECT * FROM users WHERE username = '%s' AND password = '%s';" %(username, password)
-        c.execute(statement)
+        statement = "SELECT * FROM users WHERE username = ? AND password = ?;"
+        c.execute(statement,(username, password))
         result = c.fetchall()
 
         #TODO: maybe do something here? write better logic 
@@ -141,27 +137,25 @@ def register():
     passworderror = ""
     if request.method == 'POST':
         
-        #TODO: sanitize input
         username = request.form['username']
         password = request.form['password']
         db = connect_db()
         c = db.cursor()
-        pass_statement = """SELECT * FROM users WHERE password = '%s';""" %password
-        user_statement = """SELECT * FROM users WHERE username = '%s';""" %username
-        c.execute(pass_statement)
+        pass_statement = """SELECT * FROM users WHERE password = ? ;"""
+        user_statement = """SELECT * FROM users WHERE username = ? ;"""
+        c.execute(pass_statement, password)
         if(len(c.fetchall())>0):
             errored = True
             passworderror = "That password is already in use by someone else!"
 
-        c.execute(user_statement)
+        c.execute(user_statement, username)
         if(len(c.fetchall())>0):
             errored = True
             usererror = "That username is already in use by someone else!"
-
         if(not errored):
-            statement = """INSERT INTO users(id,username,password) VALUES(null,'%s','%s');""" %(username,password)
+            statement = """INSERT INTO users(id,username,password) VALUES(null, ?, ?);"""
             print(statement)
-            c.execute(statement)
+            c.execute(statement,(username, password))
             db.commit()
             db.close()
             return f"""<html>
@@ -190,11 +184,11 @@ if __name__ == "__main__":
     #create database if it doesn't exist yet
     if not os.path.exists(app.database):
         init_db()
-    runport = 80
+    runport = 443
     if(len(sys.argv)==2):
         runport = sys.argv[1]
     try:
-        app.run(host='0.0.0.0', port=runport) # runs on machine ip address to make it visible on netowrk
+        app.run(host='0.0.0.0', port=runport, ssl_context=('certs/cert.pem', 'certs/key.pem')) # runs on machine ip address to make it visible on netowrk
     except:
         print("Something went wrong. the usage of the server is either")
         print("'python3 app.py' (to start on port 80)")
