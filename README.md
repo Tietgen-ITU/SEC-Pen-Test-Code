@@ -15,7 +15,7 @@ You will need python 3 and flask. To install do:
 $ git clone https://github.com/0xlimE/MySecretNotes.git 
 $ cd MySecretNotes 
 $ sudo apt-get install python3-pip 
-$ pip3 install flask
+$ pip3 install flask backports.pbkdf2
 $ python3 app.py 
 ``` 
 
