@@ -14,11 +14,11 @@ This flask site is a webservice mimmicking a secure note taking software site. Y
 
 You will need python 3 and flask. To install do: 
 ```sh 
-$ git clone https://github.com/0xlimE/MySecretNotes.git 
-$ cd MySecretNotes 
-$ sudo apt-get install python3-pip 
-$ pip3 install flask backports.pbkdf2
-$ python3 app.py 
+git clone https://github.com/0xlimE/MySecretNotes.git 
+cd MySecretNotes 
+sudo apt-get install python3-pip 
+pip3 install flask backports.pbkdf2
+python3 app.py 
 ``` 
 
 The project should run on port 5000 
