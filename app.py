@@ -99,7 +99,7 @@ def notes():
     c = db.cursor()
     statement = "SELECT * FROM notes WHERE assocUser = ?;"
     print(statement)
-    c.execute(statement,(session['userid']))
+    c.execute(statement,(session['userid'],))
     notes = c.fetchall()
     print(notes)
     
@@ -117,7 +117,7 @@ def login():
         statement = "SELECT * FROM users WHERE username = ? AND password = ?;"
         c.execute(statement,(username, password))
         result = c.fetchall()
-
+        print("Result", result)
         #TODO: maybe do something here? write better logic 
         if len(result) > 0:
             session.clear()
