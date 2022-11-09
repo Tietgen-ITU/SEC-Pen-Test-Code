@@ -14,7 +14,7 @@ This flask site is a webservice mimmicking a secure note taking software site. Y
 
 You will need python 3 and flask. To install do:
 
-```sh 
+```sh
 git clone https://github.com/0xlimE/MySecretNotes.git
 cd MySecretNotes
 sudo apt-get install python3-pip
