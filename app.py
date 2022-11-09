@@ -77,7 +77,7 @@ def notes():
             db = connect_db()
             c = db.cursor()
             statement = """SELECT * from NOTES where publicID = ?"""
-            c.execute(statement, noteid)
+            c.execute(statement, (noteid,))
             result = c.fetchall()
             if(len(result)>0):
                 row = result[0]
@@ -108,7 +108,7 @@ def login():
         db = connect_db()
         c = db.cursor()
         statement = "SELECT * FROM users WHERE username = ?;"
-        c.execute(statement, username)
+        c.execute(statement, (username,))
         result = c.fetchall()
         print("Result", result)
         #TODO: maybe do something here? write better logic 
@@ -141,9 +141,7 @@ def register():
         c = db.cursor()
         user_statement = """SELECT * FROM users WHERE username = ?;"""
 
-        c.execute(user_statement, username)
-        if(len(c.fetchall())>0):
-            errored = True
+        c.execute(user_statement, (username,))
             usererror = "That username is already in use by someone else!"
 
         if (not errored):
