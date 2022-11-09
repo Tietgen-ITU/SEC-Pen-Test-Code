@@ -241,6 +241,11 @@ ol, ul, dl {
   color:#14bf98
 }
 
+section.content {
+    width: 700px;
+    margin: 24px auto;
+}
+
     </style>
     
     <head>
@@ -259,44 +264,25 @@ ol, ul, dl {
 
     <body style="background-color:#fff;">
       <section class="notes__background-image">
-
-        <a href="/search/" class="notes__logout btn-solid-lg" style="margin-right: 170px;">Search pages</a>
         <a href="/logout/" class="notes__logout btn-solid-lg">Logout</a>
         <article class="notes__background-title-container">
-          <h1 class="notes__title">Welcome</h1>
-          <h2 class="notes__title-user">{{session['username']}}</h2>
+          <h1 class="notes__title">Search pages</h1>
         </article>
       </section>
-      <section class="notes__body-content notes__body-top-padding">
-        <p class="notes__text">Here are your notes:, you can share your notes by sharing your public id</p>
-        <ul class="notes__item-container">
-            {% for note in notes %}
-              {% include "note.html" %}
-            {% endfor %}
-        </ul>
+      <section class="content">
+          <form action="" method="post">
+              <input type="text" name="query" placeholder="Page name..">
+              <input type="submit" value="Search">
+          <form>
+            <ul>
+                {% for page in results %}
+                <li>
+                    <a href={{ page }}>{{ page }}</a>
+                </li>
+                {% endfor %}
+            </ul>
       </section>
-      <section class="notes__body-content notes__body-bottom-padding">
-        <div class="notes__body-top-border"></div>
-        <form action="" method="post" class="notes__input-wrapper">
-            <div class="notes__input-container">
-              <label for="note">New note:</label>
-              <textarea name="noteinput" placeholder=">Enter text here..." class="textfield form-control" value={{ request.form.noteinput }}></textarea><br>
-            </div>
-            <input class="btn-solid-lg notes__input-margin-top" type="submit" name="submit_button" value="add note">
-        </form> 
-        
-        <form action="" method="post" class="notes__input-wrapper">
-            <div class="notes__input-container">
-              <label for="note">Import a note from someone else:</label>
-              <input class="form-control notes__input__no-margin" type="text" placeholder="XXXXXXXXXX" name="noteid" value={{request.form.noteid}}>
-            </div>
-            <input class="btn-solid-lg notes__input-margin-top" type="submit" name="submit_button" value="import note">
-        </form> 
-        {% if importerror %}
-              <p class="p-large"><strong>Error:</strong> {{ importerror }}
-        {% endif %}
-      </section>     
-      
+
       <!-- Scripts -->
     <script src={{ url_for('static',filename='js/jquery.min.js') }}></script> <!-- jQuery for Bootstrap's JavaScript plugins -->
     <script src={{ url_for('static',filename='js/popper.min.js') }}></script> <!-- Popper tooltip library for Bootstrap -->
