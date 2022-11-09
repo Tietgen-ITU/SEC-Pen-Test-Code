@@ -2,6 +2,7 @@ import json, sqlite3, click, functools, os, hashlib,time, random, sys
 from flask import Flask, current_app, g, session, redirect, render_template, url_for, request
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
+import subprocess
 
 
 
@@ -166,6 +167,24 @@ def register():
         db.commit()
         db.close()
     return render_template('register.html',usererror=usererror,passworderror=passworderror)
+
+
+@app.route("/search/", methods=('GET', 'POST'))
+def search():
+    if request.method == 'POST':
+        query = request.form['query']
+
+        stream = os.popen(f'find ./templates -name "*{query}*.html"')
+        output = stream.read()
+        print(output)
+        pages = [line.replace("./templates", "").replace(".html", "").replace("index", "") for line in output.split("\n")]
+        pages = [page for page in pages if page != ""]
+
+        print(pages)
+
+        return render_template('search.html', results=pages)
+
+    return render_template('search.html', results=[])
 
 
 @app.route("/logout/")
