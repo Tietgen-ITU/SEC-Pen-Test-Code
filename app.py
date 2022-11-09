@@ -98,7 +98,6 @@ def notes():
     db = connect_db()
     c = db.cursor()
     statement = "SELECT * FROM notes WHERE assocUser = ?;"
-    print(statement)
     c.execute(statement,(session['userid'],))
     notes = c.fetchall()
     print(notes)
@@ -154,7 +153,6 @@ def register():
             usererror = "That username is already in use by someone else!"
         if(not errored):
             statement = """INSERT INTO users(id,username,password) VALUES(null, ?, ?);"""
-            print(statement)
             c.execute(statement,(username, password))
             db.commit()
             db.close()
