@@ -30,7 +30,7 @@ def init_db():
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             username TEXT NOT NULL,
             password_hash TEXT NOT NULL,
-            salt TEXT NOT NULL,
+            salt TEXT NOT NULL
         );
     """)
 
@@ -101,7 +101,6 @@ def notes():
 @app.route("/login/", methods=('GET', 'POST'))
 @limiter.limit("50 per hour")
 def login():
-    error = ""
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
@@ -110,29 +109,27 @@ def login():
         statement = "SELECT * FROM users WHERE username = ?;"
         c.execute(statement, (username,))
         result = c.fetchall()
-        print("Result", result)
-        #TODO: maybe do something here? write better logic 
-        if len(result) > 0:
-            user = result[0]
+        
+        if len(result) < 1:
+            return render_template('login.html', error = "No such user!")
 
-            if not verify_password(password, derived_key = user[2], salt = user[3]):
-                render_template('login.html', error = "Wrong password!")
+        user = result[0]
 
-            session.clear()
-            session['logged_in'] = True
-            session['userid'] = user[0]
-            session['username'] = user[1]
-            return redirect(url_for('index'))
-        else:
-            error = "Wrong username or password!"
-    return render_template('login.html',error=error)
+        if not verify_password(password, derived_key = user[2], salt = user[3]):
+            return render_template('login.html', error = "Incorrect password!")
+
+        session.clear()
+        session['logged_in'] = True
+        session['userid'] = user[0]
+        session['username'] = user[1]
+
+        return redirect(url_for('index'))
+
+    return render_template('login.html')
 
 
 @app.route("/register/", methods=('GET', 'POST'))
 def register():
-    errored = False
-    usererror = ""
-    passworderror = ""
     if request.method == 'POST':
         username = request.form['username']
         derived_key, salt = hash_password(request.form['password'])
@@ -142,29 +139,30 @@ def register():
         user_statement = """SELECT * FROM users WHERE username = ?;"""
 
         c.execute(user_statement, (username,))
-            usererror = "That username is already in use by someone else!"
 
-        if (not errored):
-            statement = """
-                INSERT INTO users(id, username, password_hash, salt)
-                VALUES(null, ?, ?, ?);
-            """
-            c.execute(statement, (username, derived_key, salt))
-            db.commit()
-            db.close()
-            return f"""<html>
-                        <head>
-                            <meta http-equiv="refresh" content="2;url=/" />
-                        </head>
-                        <body>
-                            <h1>SUCCESS!!! Redirecting in 2 seconds...</h1>
-                        </body>
-                        </html>
-                        """
-        
+        if len(c.fetchall()) > 0:
+            return render_template('register.html', usererror = "That username is already in use by someone else!")
+
+        statement = """
+            INSERT INTO users(id, username, password_hash, salt)
+            VALUES(null, ?, ?, ?);
+        """
+        c.execute(statement, (username, derived_key, salt))
         db.commit()
         db.close()
-    return render_template('register.html',usererror=usererror,passworderror=passworderror)
+
+        return """
+            <html>
+                <head>
+                    <meta http-equiv="refresh" content="2;url=/" />
+                </head>
+                <body>
+                    <h1>SUCCESS!!! Redirecting in 2 seconds...</h1>
+                </body>
+            </html>
+        """
+
+    return render_template('register.html')
 
 
 @app.route("/logout/")
