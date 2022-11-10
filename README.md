@@ -24,13 +24,19 @@ $ make setup
 To run in dev mode:
 
 ```sh
-$ make run
+$ make dev
+```
+
+TO run in staging mode (production HTTP server, port 8022)
+
+```sh
+$ make staging
 ```
 
 To run in production mode:
 
 ```sh
-$ make prod
+$ sudo make prod
 ```
 
 The project should run on port 5000
