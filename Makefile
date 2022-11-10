@@ -12,4 +12,4 @@ deps:
 setup: deps gen-certs
 
 prod: setup
-    gunicorn --certfile certs/cert.pem --keyfile certs/key.pem -b 0.0.0.0:8080 -w 1 'app:create_app()'
+	gunicorn --certfile certs/cert.pem --keyfile certs/key.pem -b 0.0.0.0:8080 -w 1 'app:create_app()'
