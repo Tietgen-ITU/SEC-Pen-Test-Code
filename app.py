@@ -36,6 +36,26 @@ def init_db(app):
         );
     """)
 
+    insert_user = """
+        INSERT INTO users(id, username, password_hash, salt)
+        VALUES(null, ?, ?, ?);
+    """
+    insert_note = """
+        INSERT INTO notes (id, assocUser, dateWritten, note, publicID)
+        VALUES(null, ?, ?, ?, ?);
+    """
+    db.execute(insert_user, ("admin",
+        b'5db32a67dfe8c57d4590cf0b1befda947357a4b59a52499c3ec04dfafb9e2e31',
+        b'd480b10e3f15b02bef248c7abd415d324f73119f1b0cec20fcc706fd2ae94d85'
+    ))
+    db.execute(insert_user, ("bernardo",
+        b'f9cbd7e2689d5268bd400af49d07db2f57b6cfe4455d8dacbdf6a0a86f8f896e',
+        b'c61f1a394d44f12ea0a085b96733ef6e15b36af30bba12571f1ec4aa4dc09805'
+    ))
+    db.execute(insert_note, (2, "1993-09-23 10:10:10", "hello my friend", 1234567890))
+    db.execute(insert_note, (2, "1993-09-23 12:10:10", "i want lunch pls", 1234567891))
+    conn.commit()
+
 def create_app(_environment=None, _start_resp=None):
     ### APPLICATION SETUP ###
     app = Flask(__name__)
